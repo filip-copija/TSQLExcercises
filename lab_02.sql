@@ -2,6 +2,9 @@ use master
 create database University
 go
 
+use University
+go
+
 create table students(
 student_id int primary key,
 surname varchar(50) not null,
