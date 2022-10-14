@@ -1,75 +1,95 @@
-CREATE TABLE groups(
-	group_no char(20),
-	CONSTRAINT cons_grupy PRIMARY KEY(group_no)
-	)
+use master
+create database University
+go
 
-ALTER TABLE students ADD
-	CONSTRAINT rgs FOREIGN KEY(group_no) REFERENCES groups(group_no)
-	ON DELETE NO ACTION ON UPDATE CASCADE
+create table students(
+student_id int primary key,
+surname varchar(50) not null,
+first_name varchar(50),
+date_of_birth date default getdate(),
+group_no char(20)
+)
 	
-CREATE TABLE tution_fees(
-	payment_id int IDENTITY PRIMARY KEY,
-	student_id int NOT NULL,
-	fee_amount decimal(8,2) NOT NULL,
-	date_of_payment date DEFAULT CURRENT_TIMESTAMP,
-	CONSTRAINT rstf FOREIGN KEY(student_id) REFERENCES students(student_id)
-	)
+create table groups(
+group_no char(20) primary key
+)
 
-CREATE TABLE departments(
-	department varchar(50)
-	CONSTRAINT rdm PRIMARY KEY(department)
-	)
+alter table students add
+constraint rgs foreign key(group_no) references groups(group_no)
+on delete no action on update cascade
 
-CREATE TABLE modules(
-	module_id int IDENTITY PRIMARY KEY,
-	module_name varchar(50) UNIQUE,
-	no_of_hours int NOT NULL,
-	lecturer_id int,
-	preceding_module varchar(50),
-	depratment varchar(50) NOT NULL
-	)
+create table tuition_fees(
+payment_id int identity primary key,
+student_id int not null,
+fee_amount decimal(8,2) not null,
+date_of_payment date default getdate(),
+constraint rstf foreign key(student_id) references students
+)
 
-CREATE TABLE students_modules(
-	student_id int,
-	module_id int,
-	planned_exam_date date
-	)
+create table departments(
+department varchar(50) primary key
+)
 
-CREATE TABLE student_grades(
-	student_id int,
-	module_id int,
-	exam_date int,
-	grade decimal(3,2)
-	)
+create table acad_positions(
+acad_position varchar(50) primary key,
+overtime_rate decimal(8,2) not null
+)
 
-CREATE TABLE grades(
-	grade int
-	CONSTRAINT rgrs PRIMARY KEY(grade)
-	)
+create table employees(
+employee_id int primary key,
+surname varchar(50) not null,
+first_name varchar(50) not null,
+employment_date date,
+PESEL char(11)
+)
 
-CREATE TABLE lecturers(
-	lecturer_id int PRIMARY KEY IDENTITY,
-	acad_position varchar(50),
-	department varchar(50)
-	CONSTRAINT rla FOREIGN KEY(acad_position) REFERENCES acad_positions(acad_position)
-	)
+create table lecturers(
+lecturer_id int primary key,
+acad_position varchar(50) null,
+department varchar(50) not null
+constraint rl1 foreign key(lecturer_id) references employees(employee_id)
+on delete cascade,
+constraint rl2 foreign key(acad_position) references acad_positions(acad_position)
+on delete no action on update cascade,
+constraint rl3 foreign key(department) references departments(department)
+on delete no action on update cascade
+)
 
-ALTER TABLE lecturers ADD 
-	CONSTRAINT rld FOREIGN KEY(department) REFERENCES departments(department)
-	ON DELETE NO ACTION ON UPDATE CASCADE
+create table modules(
+module_id int identity primary key,
+module_name varchar(50) unique not null,
+no_of_hours int not null,
+lecturer_id int,
+preceding_module int,
+department varchar(50)not null
+constraint rm1 foreign key(preceding_module) references modules(module_id),
+constraint rm2 foreign key(lecturer_id) references lecturers(lecturer_id),
+constraint rm3 foreign key(department) references departments(department)
+on delete no action on update cascade
+)
 
-CREATE TABLE employees(
-	employee_id int PRIMARY KEY IDENTITY,
-	surname varchar(50) NOT NULL,
-	first_name varchar(50) NOT NULL,
-	employe_date date DEFAULT CURRENT_TIMESTAMP,
-	PESEL char(11) UNIQUE
-	)
+create table grades(
+grade decimal (2,1) primary key
+)
 
-CREATE TABLE acad_positions(
-	acad_position varchar(50) PRIMARY KEY,
-	overtime_rate int
-	)
+create table students_modules(
+student_id int,
+module_id int,
+planned_exam_date date,
+constraint pk1 primary key(student_id, module_id),
+constraint rsm1 foreign key(student_id) references students(student_id)
+on delete cascade,
+constraint rsm2 foreign key(module_id) references modules(module_id)
+)
 
-
-
+create table student_grades(
+student_id int,
+module_id int,
+exam_date date,
+grade decimal(2,1),
+constraint pk_sg1 primary key(student_id, module_id, exam_date),
+constraint rsg1 foreign key(student_id, module_id) references students_modules(student_id, module_id)
+on delete cascade,
+constraint rsg2 foreign key(grade) references grades(grade)
+on delete no action on update cascade
+)
