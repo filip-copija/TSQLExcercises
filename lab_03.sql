@@ -1,7 +1,7 @@
--- 11.01 (NULL w wyra¿eniach i funkcjach agreguj¹cych)
+-- 11.01 (NULL w wyraÂ¿eniach i funkcjach agregujÂ¹cych)
 -- a)
 SELECT 34+NULL
--- zwraca NULL dla ka¿dego dzia³ania zawieraj¹cego NULL
+-- zwraca NULL dla kaÂ¿dego dziaÂ³ania zawierajÂ¹cego NULL
 
 -- b)
 SELECT * FROM employees WHERE PESEL IS NULL OR employment_date IS NULL
@@ -48,7 +48,7 @@ SELECT module_name, lecturer_id
 FROM modules
 WHERE lecturer_id = 8 OR COALESCE(lecturer_id, 0) = 0
 
--- b) IS NULL => to rozwi¹zanie jest SARG, poniewa¿ nie jest argumentem funkcji
+-- b) IS NULL => to rozwiÂ¹zanie jest SARG, poniewaÂ¿ nie jest argumentem funkcji
 SELECT module_name, lecturer_id
 FROM modules
 WHERE lecturer_id = 8 OR lecturer_id IS NULL
