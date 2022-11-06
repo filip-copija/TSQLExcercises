@@ -152,10 +152,104 @@ WHERE nazwisko COLLATE polish_CS_as LIKE '%K_'
 SELECT * FROM #tmp
 WHERE nazwisko ='kowalski'
 
+SELECT * FROM #tmp
+WHERE nazwisko LIKE '_o%'
+
+-- użycie COLLATE nie było konieczne w żadnym przypadku, ponieważ zastosowaliśmy je przy tworzeniu tabeli co wpłyneło na ostateczny wynik wyszukiwania w przykładzie b)
+
+-- 11.10 
+-- a) !!!
+SELECT surname, group_no
+FROM students
+ORDER BY group_no
+
+-- 11.11 (TOP)
+-- a) 
+SELECT TOP 5 *
+FROM student_grades
+ORDER BY exam_date ASC
+
+-- b)
+SELECT TOP 5 WITH TIES * 
+FROM student_grades
+ORDER BY exam_date ASC
+
+-- otrzymujemy o 1 rekord więcej, z racji że dla warunku exam_date jest on identyczny jak pozostałe 2
+
+-- 11.12 (TOP, OFFEST)
+-- a) (58)
+SELECT * FROM student_grades
+
+-- b) 20% z 58 = 11,6, a wynik zostaje zaokrąglony do 12
+SELECT TOP(20) PERCENT *
+FROM student_grades
+ORDER BY exam_date DESC
+
+-- c) 
+SELECT * 
+FROM student_grades
+ORDER BY exam_date ASC
+OFFSET 6 ROWS  FETCH NEXT 10 ROWS ONLY
+
+-- d)
+SELECT * 
+FROM student_grades
+ORDER BY exam_date ASC
+OFFSET 20 ROWS 
+
 -- 11.13 (INTERSECT, UNION, EXCEPT)
+-- a) 
+SELECT surname FROM students
+UNION 
+SELECT surname FROM employees
+ORDER BY surname 
+
+-- b)
+SELECT surname FROM students
+UNION ALL
+SELECT surname FROM employees
+ORDER BY surname 
+
+-- c)
+SELECT surname FROM students
+EXCEPT
+SELECT surname FROM employees
+
+-- d)
+SELECT surname FROM students
+INTERSECT
+SELECT surname FROM employees
+
+-- e)
+SELECT department FROM departments
+EXCEPT 
+SELECT department FROM lecturers
+
+-- f)
+SELECT module_id FROM modules
+EXCEPT 
+SELECT preceding_module FROM modules
+
 -- g)
 SELECT student_id, module_id
 FROM students_modules
 EXCEPT
 SELECT student_id, module_id
 FROM student_grades
+
+-- h)
+SELECT student_id FROM students_modules
+WHERE module_id = 3
+INTERSECT
+SELECT student_id FROM students_modules
+WHERE module_id = 12
+
+-- i) 
+SELECT surname, first_name, group_no AS group_departmet
+FROM students
+WHERE group_no LIKE 'DMIe%' 
+UNION
+SELECT employees.first_name, employees.surname, lecturers.department
+FROM employees, lecturers
+WHERE lecturers.lecturer_id = employees.employee_id
+ORDER BY students.group_no
