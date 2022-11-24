@@ -1,4 +1,5 @@
--- Skill 1.2 – u¿ywaj¹c sk³adni z³¹czeñ napisz zapytania do bazy danych college.
+create database BANKACCOUNT
+-- Skill 1.2 ï¿½ uï¿½ywajï¿½c skï¿½adni zï¿½ï¿½czeï¿½ napisz zapytania do bazy danych college.
 -- 12.01
 select m.module_id, m.module_name
 from modules m left join students_modules sm on m.module_id = sm.module_id
@@ -56,6 +57,99 @@ from students s
 join students_modules sm on s.student_id = sm.student_id
 join modules m on m.module_id = sm.module_id
 where m.module_name = 'Statistics'
+
+-- 12.10
+select e.surname, e.first_name, l.acad_position
+from lecturers l
+join employees e on e.employee_id = l.lecturer_id
+where l.department = 'Department of Informatics'
+order by e.surname, e.first_name asc
+
+-- 12.11
+select surname, first_name, l.department
+from employees e
+left join lecturers l on l.lecturer_id = e.employee_id
+order by surname, first_name desc
+
+-- 12.12
+select surname, first_name, l.department
+from employees e
+join lecturers l on l.lecturer_id = e.employee_id
+order by surname, first_name desc
+
+-- 12.13
+select l.lecturer_id, surname, first_name, l.acad_position
+from employees e
+join lecturers l on l.lecturer_id = e.employee_id
+left join modules m on l.lecturer_id = m.lecturer_id
+where m.lecturer_id IS NULL
+order by l.acad_position desc
+
+-- 12.14
+select s.first_name, s.surname, m.module_name,
+e.surname as 'lecturer_surname', l.department
+from students s
+left join students_modules sm on s.student_id = sm.student_id
+left join modules m on sm.module_id = m.module_id
+left join lecturers l on m.lecturer_id = l.lecturer_id
+left join employees e on e.employee_id = l.lecturer_id
+order by m.module_name desc, lecturer_surname asc
+
+-- 12.15
+select sum(no_of_hours)
+from modules m
+left join lecturers l on l.lecturer_id = m.lecturer_id
+where m.lecturer_id is null or l.acad_position is null
+
+-- 12.16
+select module_id, module_name, l.department
+from modules m
+left join lecturers l on l.lecturer_id = m.lecturer_id
+where m.lecturer_id is null or l.acad_position is null
+
+-- 12.17
+select module_name, no_of_hours, e.surname, l.department
+from modules m
+left join lecturers l on l.lecturer_id = m.lecturer_id
+join employees e on e.employee_id = l.lecturer_id
+where m.module_name collate polish_CS_as like 'computer%'
+order by e.surname
+
+-- 12.18
+select module_name, no_of_hours, e.surname, l.department
+from modules m
+left join lecturers l on l.lecturer_id = m.lecturer_id
+left join employees e on e.employee_id = l.lecturer_id
+where m.module_name collate polish_CS_as like 'Computer%'
+order by e.surname
+
+-- 12.19 :((((((
+select s.student_id, s.surname, m.module_name, sg.grade
+from student_grades sg
+join students s on s.student_id = sg.student_id
+join modules m on m.module_id = sg.module_id
+join grades g on g.grade = sg.grade
+--where g.grade != sg.grade
+
+-- 12.20 XD
+
+-- 12.21
+select module_name
+from modules m
+left join lecturers l on m.lecturer_id = l.lecturer_id
+where m.department != l.department
+
+-- 12.22
+select e.surname, e.first_name, e.PESEL as 'pesel/grupa', m.department
+from employees e
+left join lecturers l on l.lecturer_id = e.employee_id
+left join modules m on m.lecturer_id = l.lecturer_id
+where m.lecturer_id IS NOT NULL
+union all
+select s.surname, s.first_name, s.group_no as 'pesel/grupa', m.department
+from students_modules sm
+left join modules m on sm.module_id = m.module_id
+left join students s on sm.student_id = s.student_id 
 
 
 
