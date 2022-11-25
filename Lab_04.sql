@@ -1,5 +1,4 @@
-create database BANKACCOUNT
--- Skill 1.2 � u�ywaj�c sk�adni z��cze� napisz zapytania do bazy danych college.
+-- Skill 1.2 -> używając składni złączeń napisz zapytania do bazy danych college.
 -- 12.01
 select m.module_id, m.module_name
 from modules m left join students_modules sm on m.module_id = sm.module_id
