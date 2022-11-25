@@ -123,15 +123,21 @@ left join employees e on e.employee_id = l.lecturer_id
 where m.module_name collate polish_CS_as like 'Computer%'
 order by e.surname
 
--- 12.19 :((((((
+-- 12.19
 select s.student_id, s.surname, m.module_name, sg.grade
-from student_grades sg
-join students s on s.student_id = sg.student_id
-join modules m on m.module_id = sg.module_id
-join grades g on g.grade = sg.grade
---where g.grade != sg.grade
+from students s
+join students_modules sm on s.student_id = sm.student_id
+join modules m on sm.module_id = m.module_id
+left join student_grades sg on sm.student_id = sg.student_id
+and sm.module_id = sg.module_id
+where sg.grade is null
 
--- 12.20 XD
+-- 12.20
+select s.student_id, s.surname, m.module_name, sg.grade
+from students s
+join student_grades sg on sg.student_id = s.student_id
+join modules m on m.module_id = sg.module_id
+order by sg.student_id, sg.module_id desc, sg.grade desc
 
 -- 12.21
 select module_name
@@ -140,17 +146,13 @@ left join lecturers l on m.lecturer_id = l.lecturer_id
 where m.department != l.department
 
 -- 12.22
-select e.surname, e.first_name, e.PESEL as 'pesel/grupa', m.department
-from employees e
-left join lecturers l on l.lecturer_id = e.employee_id
-left join modules m on m.lecturer_id = l.lecturer_id
-where m.lecturer_id IS NOT NULL
-union all
-select s.surname, s.first_name, s.group_no as 'pesel/grupa', m.department
-from students_modules sm
-left join modules m on sm.module_id = m.module_id
-left join students s on sm.student_id = s.student_id 
-
-
-
- 
+select e.surname, e.first_name, e.PESEL, m.module_name, 'wykładowca' as siema
+from lecturers l
+LEFT join employees e on l.lecturer_id = e.employee_id
+INNER join modules m on l.lecturer_id = m.lecturer_id
+union
+select s.surname, s.first_name, s.group_no, m.module_name, 'student' as siema
+from students s
+LEFT join students_modules sm on s.student_id = sm.student_id
+LEFT join modules m on sm.module_id = m.module_id
+order by m.module_name asc, siema asc
