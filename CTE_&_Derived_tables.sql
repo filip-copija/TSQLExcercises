@@ -312,3 +312,47 @@ AND group_no = @D2
 SELECT * FROM f_youngest_students(4, 'DMIe1011')
 SELECT * FROM f_youngest_students(3, 'ZMIe2012')
 SELECT * FROM f_youngest_students(5, 'DZZa3001')
+
+-- 22.08a – recursive CTE
+/* Module_id, module_name and no_of_hours wykładu o identyfikatorze 9 wraz z łańcuchem poprzedzających wykładów.
+Kolumnę zawierającą kolejny poziom nazwij distance. */
+
+WITH C AS
+(
+	SELECT *, 0 AS distance
+	FROM modules
+	WHERE module_id = 9
+		UNION ALL
+	SELECT D.*, S.distance + 1
+	FROM C S 
+	JOIN modules D on s.preceding_module = D.module_id
+)
+SELECT module_id, module_name, no_of_hours, distance
+FROM C
+
+-- 22.08b
+/* Na podstawie powyższego zapytania napisz funkcję o nazwie preceding_modules zwracającą module_id, module_no oraz 
+no_of_hours wykładu o identyfikatorze podanym jako parametr funkcji wraz z łańcuchem poprzedzających wykładów. */
+
+CREATE OR ALTER FUNCTION f_preceding_modules(@ID INT)
+RETURNS TABLE AS RETURN
+(
+	WITH C AS
+(
+	SELECT *, 0 AS distance
+	FROM modules
+	WHERE module_id = @ID
+		UNION ALL
+	SELECT D.*, S.distance + 1
+	FROM C S 
+	JOIN modules D on s.preceding_module = D.module_id
+)
+SELECT module_id, module_name, no_of_hours, distance
+FROM C
+)
+SELECT *
+FROM f_preceding_modules(9)
+SELECT *
+FROM f_preceding_modules(5)
+SELECT *
+FROM f_preceding_modules(8)
