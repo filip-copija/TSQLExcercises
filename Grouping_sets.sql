@@ -45,6 +45,56 @@ Napisz zapytanie zwracające liczbę rekordów znajdujących się w tabeli modul
 Odpowiedz na pytanie, dlaczego liczba rekordów w tabeli modules (26) jest różna 
 od liczby wykładów zwróconych w ostatnim rekordzie poprzedniego zapytania (20). */
 
+SELECT COUNT(*) modules -- niektóre wykłady przypisane mają te same katedry
+
+-- 4b.2a
+/* Numery grup, do których zapisany jest co najmniej jeden student, nazwy wszystkich 
+wykładów, na które studenci są zapisani oraz informację o liczbie studentów w ramach
+każdej grupy oddzielnie zapisanych na poszczególne wykłady. */
+
+SELECT group_no, module_name, COUNT(sm.student_id) AS no_of_students
+FROM students s
+LEFT JOIN students_modules sm ON s.student_id = sm.student_id
+LEFT JOIN modules m ON sm.module_id = m.module_id
+GROUP BY ROLLUP(group_no, module_name)
+
+/* W pierwszych 16 rekordach w polu group_no znajduje się wartość NULL.
+Zinterpretuj tę informację. */
+
+-- są to studenci bez grup
+
+--4b.2b
+/* Zmodyfikuj poprzednie zapytanie, aby zwracało wynik działania funkcji
+GROUPING_ID (kolumnę nazwij grp_id). Zinterpretuj znaczenie liczb 0, 1 i 3
+znajdujących się w kolumnie zawierającej wynik działania tej funkcji. */
+
+SELECT GROUPING_ID(group_no, module_name) as grp_id,
+group_no, module_name, COUNT(sm.student_id) AS no_of_students
+FROM students s
+LEFT JOIN students_modules sm ON s.student_id = sm.student_id
+LEFT JOIN modules m ON sm.module_id = m.module_id
+GROUP BY ROLLUP(group_no, module_name)
+
+-- 0 grupowanie po group_no, module_name
+-- 1 grupowanie po group_no
+-- 3 (011)
+
+-- 4b.2c
+/* Zmodyfikuj poprzednie zapytanie, aby zwracało jedynie rekordy, które 
+w polu grp_id mają liczbę 1. */
+
+SELECT GROUPING_ID(group_no, module_name) as grp_id,
+group_no, module_name, COUNT(sm.student_id) AS no_of_students
+FROM students s
+LEFT JOIN students_modules sm ON s.student_id = sm.student_id
+LEFT JOIN modules m ON sm.module_id = m.module_id
+GROUP BY ROLLUP(group_no, module_name)
+HAVING GROUPING_ID(group_no, module_name) = 1
+
+-- Napisz zapytanie zwracające informację o liczbie RÓŻNYCH grup w tabeli students. 
+SELECT COUNT(DISTINCT group_no) FROM students
+-- NULL oznacza, że studenci nie sa przypisani do grupy i jest ich 24
+
 -- 4b.3
 /* Nazwy stopni/tytułów naukowych, nazwy katedr oraz informację, ile godzin mają 
 poszczególne grupy wykładowców (posiadających taki sam stopień/tytuł) w ramach każdej 
